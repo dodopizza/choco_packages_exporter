@@ -1,6 +1,6 @@
 # Choco packages exporter
 
-![Choco packages exporter](https://github.com/dodopizza/choco_packages_exporter/workflows/Mainline/badge.svg?branch=master)
+![Build draft-release](https://github.com/dodopizza/choco_packages_exporter/workflows/Build%20draft-release/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/dodopizza/choco_packages_exporter)](https://goreportcard.com/report/github.com/dodopizza/choco_packages_exporter)
 [![codecov](https://codecov.io/gh/dodopizza/choco_packages_exporter/branch/master/graph/badge.svg)](https://codecov.io/gh/dodopizza/choco_packages_exporter)
 ![GitHub Release](https://img.shields.io/github/release/dodopizza/choco_packages_exporter.svg?style=flat)
