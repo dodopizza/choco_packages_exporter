@@ -1,0 +1,7 @@
+.DS_Store
+.devcontainer/
+.idea/
+.vagrant/
+pkg/mod/
+build/*
+!.safe

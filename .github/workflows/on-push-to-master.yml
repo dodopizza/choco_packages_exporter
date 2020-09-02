@@ -1,0 +1,60 @@
+name: Build draft-release
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Push to master
+    runs-on: windows-latest
+    env:
+      appVersion: "0.1.${{ github.run_number }}"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.15.1'
+
+      - name: Check go version
+        run: go version
+
+      - name: Get dependencies
+        run: |
+          set GO111MODULE=on
+          go get -d -v .\...
+
+      - name: Run unit-tests
+        run: |
+          go test -v .\...
+          go test -race -coverprofile="coverage.txt" -covermode="atomic" -v .\...
+
+      - name: Build binaries
+        run: go build -ldflags "-X main.appConfigVersion=$env:appVersion" -o .\ .\...
+
+      - name: Create draft release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.appVersion }}
+          release_name: Release v${{ env.appVersion }}
+          draft: true
+          prerelease: false
+
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: .\choco_packages_exporter.exe
+          asset_name: choco_packages_exporter.exe
+          asset_content_type: application/vnd.microsoft.portable-executable
+
+      - uses: codecov/codecov-action@v1
