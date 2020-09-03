@@ -15,11 +15,12 @@ func Test_extractPackageInfoFromPackagesMultilineString(t *testing.T) {
 		want [][]string
 	}{
 		{
-			"2 elements list",
-			args{"Chocolatey v0.10.11\n7zip.install 19.0"},
+			"3 elements list",
+			args{"aspnetcore-runtimepackagestore|3.1.6\n7zip|8.1.0\nKB2919442|1.0.20160915"},
 			[][]string{
-				{"Chocolatey v0.10.11", "Chocolatey", "0.10.11"},
-				{"7zip.install 19.0", "7zip.install", "19.0"},
+				{"aspnetcore-runtimepackagestore|3.1.6", "aspnetcore-runtimepackagestore", "3.1.6"},
+				{"7zip|8.1.0", "7zip", "8.1.0"},
+				{"KB2919442|1.0.20160915", "KB2919442", "1.0.20160915"},
 			},
 		},
 	}
