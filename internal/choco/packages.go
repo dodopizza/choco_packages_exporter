@@ -42,7 +42,7 @@ func updatePackages(packages *ChocoPackages) {
 	packages.list = []ChocoPackageInfo{}
 	var packagesStr string
 	if runtime.GOOS == "windows" {
-		packagesStr = executeCommandWithOutput(packages.logger, getChocoExecutable(), "list", "-lo")
+		packagesStr = executeCommandWithOutput(packages.logger, getChocoExecutable(), "list", "-lo", "-r")
 	} else {
 		packages.logger.Info(1,"This exporter was designed for Windows OS. Using example output instead of real choco")
 		packagesStr = executeCommandWithOutput(packages.logger, "cat", "examples/choco_packages_output_demo.txt")
@@ -62,7 +62,7 @@ func getChocoExecutable() string {
 }
 
 func extractPackageInfoFromPackagesMultilineString(str string) [][]string {
-	var re = regexp.MustCompile(`(?m)(?P<name>.+) [v ]?(?P<version>[\d.]+)`)
+	var re = regexp.MustCompile(`/^(?m)(?P<name>.+)\|[v ]?(?P<version>[\d.]+)$/m`)
 	return re.FindAllStringSubmatch(str, -1)
 }
 
