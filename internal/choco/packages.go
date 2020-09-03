@@ -62,7 +62,7 @@ func getChocoExecutable() string {
 }
 
 func extractPackageInfoFromPackagesMultilineString(str string) [][]string {
-	var re = regexp.MustCompile(`/^(?m)(?P<name>.+)\|[v ]?(?P<version>[\d.]+)$/m`)
+	var re = regexp.MustCompile(`(?m)(?P<name>.+)\|[v ]?(?P<version>[\d.]+)`)
 	return re.FindAllStringSubmatch(str, -1)
 }
 
