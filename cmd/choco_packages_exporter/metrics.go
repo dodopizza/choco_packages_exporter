@@ -25,6 +25,18 @@ func updateMetric(prometheusCounter *prometheus.Counter) {
 		promLabels[sanitizePromLabelName(p.GetName())] = p.GetVersion()
 	}
 	svclog.Info(1, "Updating counter object")
+
+	defer func() {
+		if err := recover(); err != nil {
+			svclog.Error(1, "panic occurred:", err)
+
+			for k, v := range promLabels {
+				svclog.Info(1, fmt.Sprintf("key: %s, value: %s", k, v))
+			}
+
+			panic("Panic on creating new Prometheus counter")
+		}
+	}()
 	*prometheusCounter = promauto.NewCounter(prometheus.CounterOpts{
 		Name:        "winserver_choco_packages",
 		Help:        "Chocolatey packages presents on the machine",
