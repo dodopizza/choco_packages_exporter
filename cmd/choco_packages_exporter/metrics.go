@@ -28,7 +28,7 @@ func updateMetric(prometheusCounter *prometheus.Counter) {
 
 	defer func() {
 		if err := recover(); err != nil {
-			svclog.Error(1, "panic occurred:", err)
+			svclog.Error(1, fmt.Sprintf("panic occurred: %s", err))
 
 			for k, v := range promLabels {
 				svclog.Info(1, fmt.Sprintf("key: %s, value: %s", k, v))
