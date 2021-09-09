@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"regexp"
 	"time"
+
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -19,19 +20,26 @@ func sanitizePromLabelName(str string) string {
 }
 
 func updateMetric(prometheusCounter *prometheus.Counter) {
-	svclog.Info(1, "Preparing metric labels")
+	if *appConfig.debug {
+		svclog.Info(1, "Preparing metric labels")
+	}
+
 	promLabels := make(prometheus.Labels)
 	for _, p := range chocoPackages.GetPackages() {
 		promLabels[sanitizePromLabelName(p.GetName())] = p.GetVersion()
 	}
-	svclog.Info(1, "Updating counter object")
+	if *appConfig.debug {
+		svclog.Info(1, "Updating counter object")
+	}
 
 	defer func() {
 		if err := recover(); err != nil {
 			svclog.Error(1, fmt.Sprintf("panic occurred: %s", err))
 
-			for k, v := range promLabels {
-				svclog.Info(1, fmt.Sprintf("key: %s, value: %s", k, v))
+			if *appConfig.debug {
+				for k, v := range promLabels {
+					svclog.Info(1, fmt.Sprintf("key: %s, value: %s", k, v))
+				}
 			}
 
 			panic("Panic on creating new Prometheus counter")
@@ -39,7 +47,7 @@ func updateMetric(prometheusCounter *prometheus.Counter) {
 	}()
 	*prometheusCounter = promauto.NewCounter(prometheus.CounterOpts{
 		Name:        "winserver_choco_packages",
-		Help:        "Chocolatey packages presents on the machine",
+		Help:        "Chocolatey packages present on the machine",
 		ConstLabels: promLabels,
 	})
 }
@@ -51,12 +59,18 @@ func serveMetrics() {
 	go func() {
 		for {
 			updateMetric(&promCounter)
-			svclog.Info(1, "Unregistering counter")
+			if *appConfig.debug {
+				svclog.Info(1, "Unregistering counter")
+			}
 			promRegistry.Unregister(promCounter)
 			prometheus.DefaultRegisterer.Unregister(promCounter)
-			svclog.Info(1, "Registering counter")
+			if *appConfig.debug {
+				svclog.Info(1, "Registering counter")
+			}
 			promRegistry.Register(promCounter)
-			svclog.Info(1, "Waiting 1 minute for the next updates")
+			if *appConfig.debug {
+				svclog.Info(1, "Waiting 1 minute for the next updates")
+			}
 			time.Sleep(10 * time.Second)
 		}
 	}()

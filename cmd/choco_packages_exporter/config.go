@@ -15,6 +15,7 @@ type AppConfig struct {
 	appName string
 	version string
 	port    *int
+	debug   *bool
 }
 
 func (a *AppConfig) getHttpAddress() string {

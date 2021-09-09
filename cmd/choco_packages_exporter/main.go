@@ -6,15 +6,16 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/dodopizza/choco_packages_exporter/internal/choco"
+	"github.com/dodopizza/choco_packages_exporter/internal/exportersvc"
 	"golang.org/x/sys/windows/svc"
 	"golang.org/x/sys/windows/svc/eventlog"
-	"github.com/dodopizza/choco_packages_exporter/internal/exportersvc"
-	"github.com/dodopizza/choco_packages_exporter/internal/choco"
 )
 
 var (
 	//svclog = debug.New("choco_packages_exporter")
-	svclog, _ = eventlog.Open("choco_packages_exporter")
+	svclog, _     = eventlog.Open("choco_packages_exporter")
 	chocoPackages = choco.New(svclog)
 )
 
@@ -23,14 +24,15 @@ func getArguments() {
 	show_help := flag.Bool("help", false, "Help information")
 	svc_action := flag.String("service", "", "Service actions: install,remove,start,stop")
 	appConfig.port = flag.Int("port", 9804, "Metrics port")
+	appConfig.debug = flag.Bool("debug", false, "Enable debug")
 	flag.Parse()
 
-	if *show_version == true {
+	if *show_version {
 		appConfig.getAppVersion()
 		os.Exit(0)
 	}
 
-	if *show_help == true {
+	if *show_help {
 		flag.PrintDefaults()
 		os.Exit(0)
 	}
@@ -59,12 +61,11 @@ func getArguments() {
 }
 
 func init() {
-	fmt.Sprintf("Hello")
 	getArguments()
 }
 
 func main() {
-	if !(exportersvc.IsInteractiveSession(svclog)){
+	if !(exportersvc.IsInteractiveSession(svclog)) {
 		exportersvc.ProvideService(svclog, &appConfig.appName)
 		serveMetrics()
 		exportersvc.WaitForServiceStoppedStatus(svclog, &appConfig.appName)
